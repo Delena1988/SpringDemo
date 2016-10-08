@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd"
+       default-autowire="byName">
+    <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
+    <context:component-scan base-package="com"/>
+    <!-- enable autowire -->
+    <context:annotation-config/>
+
+    <bean id="dataSource-mysql" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://192.168.10.101:3306/test"/>
+        <property name="user" value="root"/>
+        <property name="password" value=""/>
+        <property name="initialPoolSize" value="1"/>
+        <property name="minPoolSize" value="0"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="acquireIncrement" value="5"/>
+        <property name="maxIdleTime" value="10"/>
+        <property name="maxStatements" value="0"/>
+    </bean>
+
+    <bean id="dataSource-sqlserver" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="net.sourceforge.jtds.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:jtds:sqlserver://192.168.10.106:1433;DatabaseName=ESB"/>
+        <property name="user" value="sa"/>
+        <property name="password" value="123456"/>
+        <property name="initialPoolSize" value="1"/>
+        <property name="minPoolSize" value="0"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="acquireIncrement" value="5"/>
+        <property name="maxIdleTime" value="10"/>
+        <property name="maxStatements" value="0"/>
+    </bean>
+
+
+    <bean id="multipleDataSource" class="com.lanniuh.MultipleDataSource">
+        <property name="defaultTargetDataSource" ref="dataSource-mysql"/>
+        <property name="targetDataSources">
+            <map>
+                <entry key="dataSource-mysql" value-ref="dataSource-mysql"/>
+                <entry key="dataSource-sqlserver" value-ref="dataSource-sqlserver"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="multipleDataSource"/>
+        <property name="mapperLocations" value="classpath*:**/*Mapper.xml" />
+        <property name="configLocation" value="mybatis-config.xml"/>
+    </bean>
+
+    <!-- mybatis.spring自动映射 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.lanniuh.student.dao"/>
+    </bean>
+</beans>

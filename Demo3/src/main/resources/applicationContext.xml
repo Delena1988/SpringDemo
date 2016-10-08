@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+       http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd" default-autowire="byName">
+    <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
+    <context:component-scan base-package="com.lanniuh"/>
+    <!-- enable autowire -->
+    <context:annotation-config />
+
+    <bean id="dataSource-mysql" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/test" />
+        <property name="user" value="root" />
+        <property name="password" value="" />
+        <property name="initialPoolSize" value="1" />
+        <property name="minPoolSize" value="0" />
+        <property name="maxPoolSize" value="10" />
+        <property name="acquireIncrement" value="5" />
+        <property name="maxIdleTime" value="10" />
+        <property name="maxStatements" value="0" />
+    </bean>
+
+    <!--<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">-->
+    <!--<constructor-arg index="0" ref="sqlSessionFactory-mysql" />-->
+    <!--</bean>-->
+
+    <!-- define the SqlSessionFactory -->
+    <bean id="sqlSessionFactory-mysql" name="sqlSessionFactory-mysql" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource-mysql" />
+        <property name="mapperLocations" value="classpath*:**/*Mapper.xml" />
+        <!--mybatis配置-->
+        <property name="configLocation" value="classpath:mybatis-config-mysql.xml"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory-mysql"/>
+        <property name="basePackage" value="com.lanniuh.order.dao" />
+    </bean>
+
+    <!-- transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager-mysql"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource-mysql" />
+        <qualifier value="mysql" />
+    </bean>
+
+    <!-- 全注解方式   需加上@Transactional -->
+    <tx:annotation-driven transaction-manager="transactionManager-mysql" />
+
+    <bean id="dataSource-sqlserver" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="net.sourceforge.jtds.jdbc.Driver" />
+        <property name="jdbcUrl" value="jdbc:jtds:sqlserver://192.168.10.106:1433;DatabaseName=ESB" />
+        <property name="user" value="sa" />
+        <property name="password" value="123456" />
+        <property name="initialPoolSize" value="1" />
+        <property name="minPoolSize" value="0" />
+        <property name="maxPoolSize" value="10" />
+        <property name="acquireIncrement" value="5" />
+        <property name="maxIdleTime" value="10" />
+        <property name="maxStatements" value="0" />
+    </bean>
+
+    <bean id="sqlSessionFactory-sqlserver" name="sqlSessionFactory-sqlserver" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource-sqlserver" />
+        <property name="mapperLocations" value="classpath*:**/*Mapper.xml" />
+        <!--mybatis配置-->
+        <property name="configLocation" value="classpath:mybatis-config-sqlserver.xml"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory-sqlserver"/>
+        <property name="basePackage" value="com.lanniuh.person.dao" />
+    </bean>
+
+    <bean id="transactionManager-sqlserver"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource-sqlserver" />
+        <qualifier value="sqlserver" />
+    </bean>
+
+    <!-- 全注解方式 -->
+    <tx:annotation-driven transaction-manager="transactionManager-sqlserver" />
+</beans>

@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="ear" name="Demo4">
+    <output-path>$PROJECT_DIR$/out/artifacts/Demo4</output-path>
+    <root id="archive" name="Demo4.ear">
+      <element id="directory" name="lib">
+        <element id="archive" name="Demo4.jar">
+          <element id="module-output" name="Demo4" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

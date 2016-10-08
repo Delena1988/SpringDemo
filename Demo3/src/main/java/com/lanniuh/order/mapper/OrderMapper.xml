@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lanniuh.order.dao.OrderDao">
+    <select id="getOrderCount" resultType="int">
+        SELECT COUNT(*) FROM t_order
+    </select>
+
+    <select id="getOrders" resultType="com.lanniuh.order.entity.Order">
+        SELECT * FROM t_order
+    </select>
+
+    <select id="getOrderById" parameterType="int" resultType="com.lanniuh.order.entity.Order">
+        SELECT * FROM t_order WHERE id = #{id}
+    </select>
+
+    <select id="getOrderPaged" resultType="com.lanniuh.order.entity.Order">
+        SELECT * FROM t_order
+    </select>
+</mapper>
